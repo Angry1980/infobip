@@ -9,6 +9,7 @@ buildscript {
         classpath "io.spring.gradle:dependency-management-plugin:0.5.4.RELEASE"
         classpath "net.ltgt.gradle:gradle-apt-plugin:0.6"
         classpath 'org.unbroken-dome.gradle-plugins:gradle-testsets-plugin:1.0.2'
+        classpath 'org.springframework.boot:spring-boot-gradle-plugin:1.4.0.RELEASE'
     }
 }
 
@@ -16,7 +17,8 @@ group 'infobip.test'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
-apply plugin: "idea"
+apply plugin: 'idea'
+apply plugin: 'spring-boot'
 
 sourceCompatibility = 1.8
 

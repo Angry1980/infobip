@@ -1,0 +1,79 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "io.spring.gradle:dependency-management-plugin:0.5.4.RELEASE"
+        classpath "net.ltgt.gradle:gradle-apt-plugin:0.6"
+        classpath 'org.unbroken-dome.gradle-plugins:gradle-testsets-plugin:1.0.2'
+    }
+}
+
+group 'infobip.test'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: "idea"
+
+sourceCompatibility = 1.8
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.12'
+}
+
+repositories {
+    mavenCentral()
+}
+
+apply plugin: "io.spring.dependency-management"
+// for annotation processor
+apply plugin: "net.ltgt.apt"
+apply plugin: 'org.unbroken-dome.test-sets'
+
+dependencyManagement {
+    imports {
+        mavenBom 'io.spring.platform:platform-bom:2.0.3.RELEASE'
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'build/generated/source/apt/main'
+        }
+    }
+}
+
+testSets {
+    integrationTest { dirName = 'integrationTest' }
+}
+
+dependencies {
+    compile 'org.hsqldb:hsqldb'
+    compile 'org.springframework.boot:spring-boot-starter-web'
+    compile 'org.springframework.boot:spring-boot-starter-data-jpa'
+    compile 'org.springframework.security:spring-security-crypto'
+    compile 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.6.5'
+    apt "org.immutables:value:2.1.15"
+    compileOnly "org.immutables:value:2.1.15:annotations" // annotation-only artifact
+    compile 'io.reactivex:rxjava:1.1.5' //todo: use spring-reactor
+    compile 'org.springframework.cloud:spring-cloud-starter-hystrix:1.1.5.RELEASE'
+    compileClasspath 'org.slf4j:slf4j-api:1.7.21'
+    compile 'org.axonframework:axon-core:2.4.4'
+    compile 'com.google.guava:guava:17.0'
+    testCompile 'junit:junit:4.11'
+    testCompile 'org.mockito:mockito-all:1.10.19'
+    testCompile 'org.springframework:spring-test'
+    integrationTestCompile 'io.rest-assured:rest-assured:3.0.0'
+}
+
+//check.dependsOn integrationTest
+//integrationTest.mustRunAfter test
+
+project.integrationTest {
+    outputs.upToDateWhen { false }
+    reports.html.destination = file("$buildDir/reports/integrationTest")
+}

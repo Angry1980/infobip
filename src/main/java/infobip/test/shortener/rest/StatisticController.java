@@ -30,7 +30,7 @@ public class StatisticController {
         urlService.getStats(user)
                 .map(stats -> ResponseEntity.ok(stats))
                 .subscribeOn(Schedulers.computation())
-                .subscribe(result::setResult, result::setErrorResult);
+                .subscribe(result::setResult, t -> result.setErrorResult(t.getCause()));
         return result;
     }
 }

@@ -55,18 +55,18 @@ public class AccountController {
 
         @Override
         public void call(Throwable throwable) {
-            if(throwable instanceof ApplicationException){
+            if(throwable.getCause() instanceof ApplicationException){
                 result.setResult(
                         ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                                 ImmutableAccountResult.builder()
                                         .success(false)
-                                        .description(((ApplicationException)throwable).getMessage())
+                                        .description(((ApplicationException)throwable.getCause()).getMessage())
                                 .build()
                         )
                 );
                 return;
             }
-            result.setErrorResult(throwable);
+            result.setErrorResult(throwable.getCause());
         }
     };
 

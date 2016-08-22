@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import rx.Observable;
 
 import java.util.Objects;
-import java.util.function.Predicate;
 
 public class AccountServiceHystrixImpl extends AbstractHystrix implements AccountService{
 
@@ -17,9 +16,7 @@ public class AccountServiceHystrixImpl extends AbstractHystrix implements Accoun
     private AccountService prototype;
 
 
-    public AccountServiceHystrixImpl(AccountService prototype,
-                                     Predicate<Throwable> ignoreExceptions) {
-        super(ignoreExceptions);
+    public AccountServiceHystrixImpl(AccountService prototype) {
         this.prototype = Objects.requireNonNull(prototype);
     }
 

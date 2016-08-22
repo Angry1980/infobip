@@ -36,7 +36,7 @@ public class UrlController {
         urlService.add(user, data)
                 .map(responseBuilder)
                 .subscribeOn(Schedulers.computation())
-                .subscribe(result::setResult, result::setErrorResult);
+                .subscribe(result::setResult, t -> result.setErrorResult(t.getCause()));
         return result;
 
     }

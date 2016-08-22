@@ -30,7 +30,7 @@ public class RedirectController {
         urlService.findFullUrl(path)
                 .map(url -> result(path, url.getData()))
                 .subscribeOn(Schedulers.computation())
-                .subscribe(result::setResult, result::setErrorResult);
+                .subscribe(result::setResult, t -> result.setErrorResult(t.getCause()));
         return result;
     }
 

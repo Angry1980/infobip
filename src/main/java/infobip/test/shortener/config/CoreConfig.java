@@ -19,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.concurrent.TimeoutException;
+
 @Configuration
 public class CoreConfig {
 
@@ -35,16 +37,14 @@ public class CoreConfig {
     @Bean
     public AccountService accountService(){
         return new AccountServiceHystrixImpl(
-                new AccountServiceAxonImpl(8, commandGateway),
-                t -> t instanceof CommandExecutionException
+                new AccountServiceAxonImpl(8, commandGateway)
         );
     }
 
     @Bean
     public UrlService urlService(){
         return new UrlServiceHystrixImpl(
-                new UrlServiceAxonImpl(commandGateway, urlQueryView(), statisticQueryView(), userQueryView()),
-                t -> t instanceof CommandExecutionException
+                new UrlServiceAxonImpl(commandGateway, urlQueryView(), statisticQueryView(), userQueryView())
         );
     }
 

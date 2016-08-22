@@ -2,7 +2,6 @@ package infobip.test.shortener.service;
 
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.netflix.hystrix.exception.HystrixBadRequestException;
-import infobip.test.shortener.model.AccountData;
 import infobip.test.shortener.model.Url;
 import infobip.test.shortener.model.UrlData;
 import infobip.test.shortener.model.User;
@@ -12,7 +11,6 @@ import rx.Observable;
 
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Predicate;
 
 public class UrlServiceHystrixImpl extends AbstractHystrix implements UrlService{
 
@@ -20,8 +18,7 @@ public class UrlServiceHystrixImpl extends AbstractHystrix implements UrlService
 
     private UrlService urlService;
 
-    public UrlServiceHystrixImpl(UrlService urlService, Predicate<Throwable> ignoreExceptions) {
-        super(ignoreExceptions);
+    public UrlServiceHystrixImpl(UrlService urlService) {
         this.urlService = Objects.requireNonNull(urlService);
     }
 

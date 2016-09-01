@@ -70,6 +70,7 @@ dependencies {
     testCompile 'junit:junit:4.11'
     testCompile 'org.mockito:mockito-all:1.10.19'
     testCompile 'org.springframework:spring-test'
+    testCompile 'org.axonframework:axon-test:2.4.4'
     integrationTestCompile 'io.rest-assured:rest-assured:3.0.0'
 }
 

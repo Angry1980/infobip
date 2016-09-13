@@ -61,7 +61,7 @@ dependencies {
     compile 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.6.5'
     apt "org.immutables:value:2.1.15"
     compileOnly "org.immutables:value:2.1.15:annotations" // annotation-only artifact
-    compile 'io.reactivex:rxjava:1.1.5' //todo: use spring-reactor
+    //compile 'io.reactivex:rxjava:1.1.5'
     compile 'org.springframework.cloud:spring-cloud-starter-hystrix:1.1.5.RELEASE'
     compile 'com.netflix.archaius:archaius-core:0.7.4'
     compileClasspath 'org.slf4j:slf4j-api:1.7.21'

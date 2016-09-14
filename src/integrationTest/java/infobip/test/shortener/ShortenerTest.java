@@ -15,11 +15,9 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.IntegrationTest;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.Map;
 import java.util.Optional;
@@ -29,12 +27,9 @@ import static io.restassured.config.RedirectConfig.redirectConfig;
 import static io.restassured.config.RestAssuredConfig.config;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = Application.class)
-@WebAppConfiguration
-@IntegrationTest("server.port:0")
+@SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ShortenerTest {
 
     private static Logger LOG = LoggerFactory.getLogger(ShortenerTest.class);

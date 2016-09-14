@@ -7,9 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import org.springframework.web.util.UriComponentsBuilder;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
@@ -32,8 +34,8 @@ public class AccountController {
 
 
     @RequestMapping(method = RequestMethod.POST)
-    public DeferredResult<ResponseEntity> create(@RequestBody AccountData accountData){
-        ServletUriComponentsBuilder urlBuilder = ServletUriComponentsBuilder.fromCurrentRequest();
+    public DeferredResult<ResponseEntity> create(@RequestBody AccountData accountData, ServerHttpRequest request){
+        UriComponentsBuilder urlBuilder = UriComponentsBuilder.fromHttpRequest(request);
         DeferredResult<ResponseEntity> result = new DeferredResult<>();
         ErrorHandler errorHandler = new ErrorHandler(result);
         accountService.open(accountData)
@@ -60,7 +62,7 @@ public class AccountController {
                         ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                                 ImmutableAccountResult.builder()
                                         .success(false)
-                                        .description(((ApplicationException)throwable.getCause()).getMessage())
+                                        .description((throwable.getCause()).getMessage())
                                 .build()
                         )
                 );

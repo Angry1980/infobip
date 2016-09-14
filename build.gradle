@@ -1,12 +1,10 @@
 buildscript {
     repositories {
         mavenCentral()
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
+        maven { url 'https://plugins.gradle.org/m2/'}
     }
     dependencies {
-        classpath "io.spring.gradle:dependency-management-plugin:0.5.4.RELEASE"
+        classpath 'io.spring.gradle:dependency-management-plugin:0.6.0.RELEASE'
         classpath "net.ltgt.gradle:gradle-apt-plugin:0.6"
         classpath 'org.unbroken-dome.gradle-plugins:gradle-testsets-plugin:1.0.2'
         classpath 'org.springframework.boot:spring-boot-gradle-plugin:1.4.0.RELEASE'
@@ -28,6 +26,7 @@ task wrapper(type: Wrapper) {
 
 repositories {
     mavenCentral()
+    maven { url 'https://repo.spring.io/milestone' }
 }
 
 apply plugin: "io.spring.dependency-management"
@@ -38,6 +37,7 @@ apply plugin: 'org.unbroken-dome.test-sets'
 dependencyManagement {
     imports {
         mavenBom 'io.spring.platform:platform-bom:2.0.3.RELEASE'
+        mavenBom 'org.springframework.boot.experimental:spring-boot-dependencies-web-reactive:0.1.0.M1'
     }
 }
 
@@ -55,19 +55,25 @@ testSets {
 
 dependencies {
     compile 'org.hsqldb:hsqldb'
-    compile 'org.springframework.boot:spring-boot-starter-web'
+    compile('org.springframework.boot.experimental:spring-boot-starter-web-reactive:0.1.0.BUILD-SNAPSHOT') {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
+    }
+    compile "io.reactivex:rxnetty-common:0.5.2-SNAPSHOT"
+    compile "io.reactivex:rxnetty-http:0.5.2-SNAPSHOT"
+
+    compile 'org.springframework.boot:spring-boot-test'
     compile 'org.springframework.boot:spring-boot-starter-data-jpa'
     compile 'org.springframework.security:spring-security-crypto'
     compile 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.6.5'
     apt "org.immutables:value:2.1.15"
     compileOnly "org.immutables:value:2.1.15:annotations" // annotation-only artifact
-    //compile 'io.reactivex:rxjava:1.1.5'
     compile 'org.springframework.cloud:spring-cloud-starter-hystrix:1.1.5.RELEASE'
     compile 'com.netflix.archaius:archaius-core:0.7.4'
+    compile "io.reactivex:rxjava:1.1.6"
     compileClasspath 'org.slf4j:slf4j-api:1.7.21'
     compile 'org.axonframework:axon-core:2.4.4'
     compile 'com.google.guava:guava:17.0'
-    testCompile 'junit:junit:4.11'
+    testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-all:1.10.19'
     testCompile 'org.springframework:spring-test'
     testCompile 'org.axonframework:axon-test:2.4.4'

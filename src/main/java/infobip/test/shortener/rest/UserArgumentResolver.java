@@ -3,11 +3,12 @@ package infobip.test.shortener.rest;
 import infobip.test.shortener.model.ImmutableUser;
 import infobip.test.shortener.model.User;
 import org.springframework.core.MethodParameter;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.crypto.codec.Base64;
-import org.springframework.web.bind.support.WebDataBinderFactory;
-import org.springframework.web.context.request.NativeWebRequest;
-import org.springframework.web.method.support.HandlerMethodArgumentResolver;
-import org.springframework.web.method.support.ModelAndViewContainer;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.reactive.result.method.HandlerMethodArgumentResolver;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
 
 public class UserArgumentResolver implements HandlerMethodArgumentResolver {
 
@@ -17,8 +18,14 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
     }
 
     @Override
-    public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest request, WebDataBinderFactory binderFactory) throws Exception {
-        String[] tokens = extractAndDecodeHeader(request.getHeader("Authorization"));
+    public Mono<Object> resolveArgument(MethodParameter parameter, ModelMap model, ServerWebExchange exchange) {
+        return Mono.create(sink -> {
+            sink.complete(resolveArgument(exchange.getRequest()));
+        });
+    }
+
+    public Object resolveArgument(ServerHttpRequest request) {
+        String[] tokens = extractAndDecodeHeader(request.getHeaders().getFirst("Authorization"));
         if(tokens == null || tokens.length != 2){
             return null;
         }

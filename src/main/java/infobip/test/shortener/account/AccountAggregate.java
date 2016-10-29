@@ -26,38 +26,29 @@ public class AccountAggregate extends AbstractAnnotatedAggregateRoot {
     }
 
     @CommandHandler
-    public AccountAggregate(ImmutableOpenAccountCommand command){
-        apply(ImmutableAccountOpenedEvent.builder()
-                .data(command.getData())
-                .password(command.getPassword())
-                .build()
-        );
+    public AccountAggregate(OpenAccountCommand command){
+        apply(new AccountOpenedEvent(command.getData(), command.getPassword()));
     }
 
     @CommandHandler
-    public void handle(ImmutableRegisterUrlCommand command){
+    public void handle(RegisterUrlCommand command){
         if(!password.equals(command.getUser().getPassword())){
             throw new UnauthorizedException(command.getUser());
         }
         if(urls.contains(command.getData().getLink())){
             throw new UrlAlreadyRegisteredException(id, command.getData());
         }
-        apply(ImmutableUrlRegisteredEvent.builder()
-                .accountId(command.getAccountId())
-                .data(command.getData())
-                .path(command.getPath())
-                    .build()
-        );
+        apply(new UrlRegisteredEvent(command.getAccountId(), command.getData(), command.getPath()));
     }
 
     @EventSourcingHandler
-    public void on(ImmutableAccountOpenedEvent event){
+    public void on(AccountOpenedEvent event){
         this.id = event.getData().getAccountId();
         this.password = event.getPassword();
     }
 
     @EventSourcingHandler
-    public void on(ImmutableUrlRegisteredEvent event) {
+    public void on(UrlRegisteredEvent event) {
         this.urls.add(event.getData().getLink());
     }
 

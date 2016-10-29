@@ -1,7 +1,6 @@
 package infobip.test.shortener.core;
 
-import infobip.test.shortener.account.ImmutableUrlRegisteredEvent;
-import infobip.test.shortener.model.ImmutableUrl;
+import infobip.test.shortener.account.UrlRegisteredEvent;
 import infobip.test.shortener.model.Url;
 import org.axonframework.eventhandling.annotation.EventHandler;
 import org.slf4j.Logger;
@@ -21,8 +20,8 @@ public class UrlQueryView {
     }
 
     @EventHandler
-    public void on(ImmutableUrlRegisteredEvent event) {
-        data.put(event.getPath(), ImmutableUrl.builder().data(event.getData()).accountId(event.getAccountId()).build());
+    public void on(UrlRegisteredEvent event) {
+        data.put(event.getPath(), new Url(event.getAccountId(), event.getData()));
         LOG.info("Add {} to {}", event.getPath(), event.getData().getLink());
     }
 

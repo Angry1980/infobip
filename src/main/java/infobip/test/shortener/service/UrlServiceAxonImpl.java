@@ -1,7 +1,7 @@
 package infobip.test.shortener.service;
 
 import com.google.common.hash.Hashing;
-import infobip.test.shortener.account.ImmutableRegisterUrlCommand;
+import infobip.test.shortener.account.RegisterUrlCommand;
 import infobip.test.shortener.axon.Utils;
 import infobip.test.shortener.core.StatisticQueryView;
 import infobip.test.shortener.core.UnauthorizedException;
@@ -10,8 +10,8 @@ import infobip.test.shortener.core.UserQueryView;
 import infobip.test.shortener.model.Url;
 import infobip.test.shortener.model.UrlData;
 import infobip.test.shortener.model.User;
-import infobip.test.shortener.url.ImmutableAddPathCommand;
-import infobip.test.shortener.url.ImmutableOpenUrlCommand;
+import infobip.test.shortener.url.AddPathCommand;
+import infobip.test.shortener.url.OpenUrlCommand;
 import org.axonframework.commandhandling.CommandExecutionException;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.slf4j.Logger;
@@ -47,7 +47,7 @@ public class UrlServiceAxonImpl implements UrlService{
             Url url = urlQueryView.get(path);
             if(url != null){
                 //catching stats, async call
-                commandGateway.send(ImmutableOpenUrlCommand.builder().path(path).url(url).build());
+                commandGateway.send(new OpenUrlCommand(path, url));
             }
             sub.onNext(url);
             sub.onCompleted();
@@ -59,13 +59,7 @@ public class UrlServiceAxonImpl implements UrlService{
         return Observable.create(sub -> {
             try{
                 String path = generatePath(user, data);
-                commandGateway.sendAndWait(
-                        ImmutableRegisterUrlCommand.builder()
-                                .user(user)
-                                .data(data)
-                                .path(path)
-                                .build()
-                );
+                commandGateway.sendAndWait(new RegisterUrlCommand(user, data, path));
                 sub.onNext(path);
                 sub.onCompleted();
             }catch(CommandExecutionException e) {
@@ -94,12 +88,7 @@ public class UrlServiceAxonImpl implements UrlService{
         while(true){
             String path = Hashing.murmur3_32().hashString(value, StandardCharsets.UTF_8).toString();
             try {
-                commandGateway.sendAndWait(
-                        ImmutableAddPathCommand.builder()
-                                .path(path)
-                                .data(data)
-                                .build()
-                );
+                commandGateway.sendAndWait(new AddPathCommand(path, data));
                 return path;
             } catch(CommandExecutionException e){
                 if(!Utils.isKeyDuplication(e)){

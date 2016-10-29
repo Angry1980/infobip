@@ -1,7 +1,6 @@
 package infobip.test.shortener.core;
 
-import infobip.test.shortener.account.ImmutableAccountOpenedEvent;
-import infobip.test.shortener.model.ImmutableUser;
+import infobip.test.shortener.account.AccountOpenedEvent;
 import infobip.test.shortener.model.User;
 import org.axonframework.eventhandling.annotation.EventHandler;
 
@@ -17,12 +16,9 @@ public class UserQueryView {
     }
 
     @EventHandler
-    public void on(ImmutableAccountOpenedEvent event) {
+    public void on(AccountOpenedEvent event) {
         users.put(event.getData().getAccountId(),
-                ImmutableUser.builder()
-                        .password(event.getPassword())
-                        .accountId(event.getData().getAccountId())
-                        .build()
+                new User(event.getData().getAccountId(), event.getPassword())
         );
     }
 

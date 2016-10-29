@@ -1,6 +1,5 @@
 package infobip.test.shortener.rest;
 
-import infobip.test.shortener.model.ImmutableUser;
 import infobip.test.shortener.model.User;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.crypto.codec.Base64;
@@ -22,7 +21,7 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
         if(tokens == null || tokens.length != 2){
             return null;
         }
-        return ImmutableUser.builder().accountId(tokens[0]).password(tokens[1]).build();
+        return new User(tokens[0], tokens[1]);
     }
 
     /*

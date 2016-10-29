@@ -13,14 +13,13 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping(value = "account", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 public class AccountController {
 
-    private static ImmutableAccountResult successResult = ImmutableAccountResult.builder()
-                                                                .success(true)
-                                                                .description("Your account is opened")
-                                                                .build();
+    private static AccountResult successResult = new AccountResult(true, "Your account is opened", Optional.empty());
 
     @Autowired
     private AccountService accountService;
@@ -39,7 +38,7 @@ public class AccountController {
         accountService.open(accountData)
                 .map(password -> ResponseEntity
                         .created(urlBuilder.path("/{id}").buildAndExpand(accountData.getAccountId()).toUri())
-                        .body(successResult.withPassword(password))
+                        .body(successResult.copy(successResult.getSuccess(), successResult.getDescription(), Optional.ofNullable(password)))
                 ).subscribeOn(Schedulers.computation())
                 .subscribe(result::setResult, errorHandler);
         return result;
@@ -56,13 +55,8 @@ public class AccountController {
         @Override
         public void call(Throwable throwable) {
             if(throwable.getCause() instanceof ApplicationException){
-                result.setResult(
-                        ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                                ImmutableAccountResult.builder()
-                                        .success(false)
-                                        .description(((ApplicationException)throwable.getCause()).getMessage())
-                                .build()
-                        )
+                result.setResult(ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                    .body(new AccountResult(false, throwable.getCause().getMessage(), Optional.empty()))
                 );
                 return;
             }

@@ -18,29 +18,24 @@ public class UrlAggregate extends AbstractAnnotatedAggregateRoot {
     }
 
     @CommandHandler
-    public UrlAggregate(ImmutableAddPathCommand command) {
-        apply(ImmutablePathAddedEvent.builder().path(command.getPath()).data(command.getData()).build());
+    public UrlAggregate(AddPathCommand command) {
+        apply(new PathAddedEvent(command.getPath(), command.getData()));
     }
 
     @CommandHandler
-    public void handle(ImmutableOpenUrlCommand command) {
-        apply(ImmutableUrlOpenedEvent.builder()
-                .accountId(command.getUrl().getAccountId())
-                .count(count + 1)
-                .link(command.getUrl().getData().getLink())
-                .build()
-        );
+    public void handle(OpenUrlCommand command) {
+        apply(new UrlOpenedEvent(command.getUrl().getAccountId(), command.getUrl().getData().getLink(), count + 1));
     }
 
     @EventSourcingHandler
-    public void on(ImmutablePathAddedEvent event) {
+    public void on(PathAddedEvent event) {
         this.path = event.getPath();
         this.url = event.getData().getLink();
         this.redirectType = event.getData().getRedirectType();
     }
 
     @EventSourcingHandler
-    public void on(ImmutableUrlOpenedEvent event) {
+    public void on(UrlOpenedEvent event) {
         this.count = event.getCount();
     }
 }

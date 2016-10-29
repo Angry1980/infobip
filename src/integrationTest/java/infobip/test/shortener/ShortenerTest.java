@@ -2,8 +2,7 @@ package infobip.test.shortener;
 
 import infobip.test.shortener.model.*;
 import infobip.test.shortener.rest.AccountResult;
-import infobip.test.shortener.rest.ImmutableAccountResult;
-import infobip.test.shortener.rest.ImmutableUrlResult;
+import infobip.test.shortener.rest.UrlResult;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.parsing.Parser;
@@ -74,10 +73,7 @@ public class ShortenerTest {
     @Test
     public void testUrlRegistration(){
         Response r = registerUrl(
-                ImmutableUrlData.builder()
-                        .link("http://url1.com")
-                        .redirectType(RedirectType.RT_301)
-                        .build(),
+                new UrlData("http://url1.com", RedirectType.RT_301),
                 "3", createAccount("3").getPassword()
         );
         r.then()
@@ -91,9 +87,7 @@ public class ShortenerTest {
     @Test
     public void testUrlRegistrationTwiceForSameAccount(){
          AccountResult account = createAccount("4");
-         UrlData data = ImmutableUrlData.builder()
-                            .link("http://url2.com")
-                            .build();
+         UrlData data = new UrlData("http://url2.com", RedirectType.RT_302);
 
          getShortUrl(data, "4", account.getPassword());
          registerUrl(data, "4", account.getPassword()).then()
@@ -103,9 +97,7 @@ public class ShortenerTest {
 
     @Test
     public void testUrlRegistrationTwiceForDifferentAccounts(){
-        UrlData data = ImmutableUrlData.builder()
-                .link("http://url3.com")
-                .build();
+        UrlData data = new UrlData("http://url3.com", RedirectType.RT_302);
         AccountResult account = createAccount("5");
         getShortUrl(data, "5", account.getPassword());
         account = createAccount("6");
@@ -119,10 +111,7 @@ public class ShortenerTest {
     @Test
     public void testUrlRegistrationWithoutAuthToken(){
         given().contentType(ContentType.JSON)
-                .body(ImmutableUrlData.builder()
-                        .link("http://url4.com")
-                        .redirectType(RedirectType.RT_301)
-                        .build())
+                .body(new UrlData("http://url4.com", RedirectType.RT_301))
                 .when().post("register").then()
                 .statusCode(HttpStatus.UNAUTHORIZED.value())
         ;
@@ -131,10 +120,7 @@ public class ShortenerTest {
     @Test
     public void testUrlRegistrationWithWrongPassword(){
         createAccount("7");
-        UrlData data = ImmutableUrlData.builder()
-                .link("http://url5.com")
-                .redirectType(RedirectType.RT_301)
-                .build();
+        UrlData data = new UrlData("http://url5.com", RedirectType.RT_301);
         registerUrl(data, "7", Optional.of("wrong password"))
                 .then()
                 .statusCode(HttpStatus.UNAUTHORIZED.value())
@@ -144,10 +130,7 @@ public class ShortenerTest {
     @Test
     public void testPermanentRedirect(){
         AccountResult result = createAccount("8");
-        UrlData data = ImmutableUrlData.builder()
-                .link("http://url6.com")
-                .redirectType(RedirectType.RT_301)
-                .build();
+        UrlData data = new UrlData("http://url6.com", RedirectType.RT_301);
         String url = getShortUrl(data, "8", result.getPassword());
         given().when().get(url)
                 .then()
@@ -159,10 +142,7 @@ public class ShortenerTest {
     @Test
     public void testTempRedirect(){
         AccountResult result = createAccount("9");
-        UrlData data = ImmutableUrlData.builder()
-                .link("http://url6.com")
-                .redirectType(RedirectType.RT_302)
-                .build();
+        UrlData data = new UrlData("http://url6.com", RedirectType.RT_302);
         String url = getShortUrl(data, "9", result.getPassword());
         given().when().get(url)
                 .then()
@@ -174,9 +154,7 @@ public class ShortenerTest {
     @Test
     public void testRedirectWithParams(){
         AccountResult result = createAccount("10");
-        UrlData data = ImmutableUrlData.builder()
-                .link("http://url6.com?a=10&b=grt")
-                .build();
+        UrlData data = new UrlData("http://url6.com?a=10&b=grt",RedirectType.RT_302);
         String url = getShortUrl(data, "10", result.getPassword());
         given().when().get(url)
                 .then()
@@ -187,11 +165,9 @@ public class ShortenerTest {
     @Test
     public void testStatistic(){
         AccountResult result = createAccount("11");
-        ImmutableUrlData data = ImmutableUrlData.builder()
-                .link("http://url8.com")
-                .build();
+        UrlData data = new UrlData("http://url8.com", RedirectType.RT_302);
         String url1 = getShortUrl(data, "11", result.getPassword());
-        String url2 = getShortUrl(data.withLink("http://url9.com"), "11", result.getPassword());
+        String url2 = getShortUrl(data.copy("http://url9.com", data.getRedirectType()), "11", result.getPassword());
         given().when().get(url1);
         given().when().get(url2);
         given().when().get(url1);
@@ -234,11 +210,11 @@ public class ShortenerTest {
     }
 
     private AccountResult createAccount(String accountId){
-        return openAccount(accountId).body().as(ImmutableAccountResult.class);
+        return openAccount(accountId).body().as(AccountResult.class);
     }
 
     private String getShortUrl(UrlData data, String account, Optional<String> password){
-        return registerUrl(data, account, password).body().as(ImmutableUrlResult.class).getShortUrl();
+        return registerUrl(data, account, password).body().as(UrlResult.class).getShortUrl();
     }
 
     private Response registerUrl(UrlData data, String account, Optional<String> password){
@@ -252,7 +228,7 @@ public class ShortenerTest {
 
     private Response openAccount(String accountId){
         return given().contentType(ContentType.JSON)
-                .body(ImmutableAccountData.builder().accountId(accountId).build())
+                .body(new AccountData(accountId))
                 .when().post("account");
     }
 }

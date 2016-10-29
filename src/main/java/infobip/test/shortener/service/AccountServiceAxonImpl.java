@@ -1,8 +1,8 @@
 package infobip.test.shortener.service;
 
+import infobip.test.shortener.account.OpenAccountCommand;
 import infobip.test.shortener.axon.Utils;
 import infobip.test.shortener.core.ApplicationException;
-import infobip.test.shortener.account.ImmutableOpenAccountCommand;
 import infobip.test.shortener.model.AccountData;
 import org.axonframework.commandhandling.CommandExecutionException;
 import org.axonframework.commandhandling.gateway.CommandGateway;
@@ -28,7 +28,7 @@ public class AccountServiceAxonImpl implements AccountService {
         return Observable.create(sub -> {
             String password = generatePassword();
             try {
-                commandGateway.sendAndWait(ImmutableOpenAccountCommand.builder().data(data).password(password).build());
+                commandGateway.sendAndWait(new OpenAccountCommand(data, password));
             } catch (CommandExecutionException e){
                 sub.onError(Utils.isKeyDuplication(e) ? new ApplicationException("Account has been already opened") : e.getCause());
                 return;

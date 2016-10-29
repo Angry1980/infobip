@@ -30,9 +30,7 @@ public class AccountServiceHystrixImplTest {
     @Test
     public void testOpenSuccess(){
         TestSubscriber<String> s = new TestSubscriber<>();
-        AccountData data = mock(AccountData.class);
-        when(data.getAccountId()).thenReturn("1");
-        accountService.open(data).subscribe(s);
+        accountService.open(new AccountData("1")).subscribe(s);
         s.assertNoErrors();
         s.assertValueCount(1);
     }
@@ -40,18 +38,14 @@ public class AccountServiceHystrixImplTest {
     @Test
     public void testOpenExecutionException(){
         TestSubscriber<String> s = new TestSubscriber<>();
-        AccountData data = mock(AccountData.class);
-        when(data.getAccountId()).thenReturn("3");
-        accountService.open(data).subscribe(s);
+        accountService.open(new AccountData("3")).subscribe(s);
         s.assertError(HystrixBadRequestException.class);
     }
 
     @Test
     public void testOpenFallback(){
         TestSubscriber<String> s = new TestSubscriber<>();
-        AccountData data = mock(AccountData.class);
-        when(data.getAccountId()).thenReturn("2");
-        accountService.open(data).subscribe(s);
+        accountService.open(new AccountData("2")).subscribe(s);
         s.assertError(HystrixRuntimeException.class);
     }
 

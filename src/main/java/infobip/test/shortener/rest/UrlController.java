@@ -1,6 +1,5 @@
 package infobip.test.shortener.rest;
 
-import infobip.test.shortener.model.ImmutableUser;
 import infobip.test.shortener.model.UrlData;
 import infobip.test.shortener.model.User;
 import infobip.test.shortener.service.UrlService;
@@ -58,7 +57,7 @@ public class UrlController {
             URI uri = urlBuilder.path("r/" + shortUrl).build().toUri();
             return ResponseEntity
                     .created(uri)
-                    .body(ImmutableUrlResult.builder().shortUrl(uri.toString()).build());
+                    .body(new UrlResult(uri.toString()));
         }
     }
 
